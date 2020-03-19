@@ -1,6 +1,6 @@
 package main
 
-accuracyThreshold := 0.8
+accuracyThreshold := 0.9
 
 deny[msg] {
     input.accuracy < accuracyThreshold
