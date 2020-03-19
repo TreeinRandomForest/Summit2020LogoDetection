@@ -37,9 +37,6 @@ spec:
           - name: source-repo
             resourceRef:
               name: source-repo-$(uid)
-          - name: event-to-sink
-            resourceRef:
-              name: event-to-sink
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
