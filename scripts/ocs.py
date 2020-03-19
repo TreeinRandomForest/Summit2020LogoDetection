@@ -1,5 +1,8 @@
 import boto3
 import os
+import urllib3
+
+urllib3.disable_warnings()
 
 s3_access_key = os.environ['ACCESS_KEY_ID']
 s3_secret_key = os.environ['SECRET_ACCESS_KEY']
