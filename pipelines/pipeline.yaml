@@ -20,6 +20,15 @@ spec:
         inputs:
           - name: source
             resource: source-repo
+    - name: publish-model
+      taskRef:
+        name: ceph-s3-to-kafka-queue
+      runAfter:
+        - model-accuracy-policy
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Task
@@ -45,3 +54,46 @@ spec:
         - $(inputs.resources.source.path)/outputs/metrics
         - -p
         - $(inputs.resources.source.path)/policy/accuracy.rego
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: ceph-s3-to-kafka-queue
+  namespace: policy-pipeline
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+    params:
+      - name: secret_name
+        type: string
+        description: Name of the secret holding the keys
+        default: ocs-secret
+  steps:
+    - name: publish-model
+      image: quay.io/ifont/ubi8-python-36
+      command:
+        - python
+        - $(inputs.resources.source.path)/scripts/ocs.py
+      env:
+      - name: ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: ACCESS_KEY_ID
+      - name: SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SECRET_ACCESS_KEY
+      - name: S3_BUCKET
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: S3_BUCKET
+      - name: S3_ENDPOINT_URL
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: S3_ENDPOINT_URL
