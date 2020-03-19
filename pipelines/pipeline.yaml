@@ -1,0 +1,107 @@
+---
+# The opa-policy Pipeline will run through several tasks:
+# - source is pulled from git
+# - conditions say go test must pass before moving on
+# - source is built into an image by img
+# - image output is pushed to ECR
+# - cloudevent emitted
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: opa-policy-pipeline
+  namespace: policy-pipeline
+spec:
+  resources:
+    - name: source-repo
+      type: git
+    - name: event-to-sink
+      type: cloudEvent
+  tasks:
+    - name: model-accuracy-policy
+      taskRef:
+        name: apply-opa-policy
+      params:
+        - name: PATH_CONTEXT
+          value: /workspace/source
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+        outputs:
+          - name: event-to-sink
+            resource: event-to-sink
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: event-to-sink
+spec:
+  type: cloudEvent
+  params:
+    - name: targetURI
+      value: http://event-display.policy-pipeline.svc.cluster.local
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: apply-opa-policy
+  namespace: policy-pipeline
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+    params:
+      - default: .
+        description: The path of the root of the repo.
+        name: PATH_CONTEXT
+        type: string
+  outputs:
+    resources:
+    - name: event-to-sink
+      type: cloudEvent
+  steps:
+    - name: apply
+      image: instrumenta/conftest:v0.17.0
+      command:
+        # Actual command name needs to be first because even if entrypoint is
+        # set to this command in the image already, the entrypoint is overridden
+        # by tekton.
+        - conftest
+        - test
+        - -i
+        - json
+        - $(inputs.resources.source.path)/outputs/metrics
+        - -p
+        - $(inputs.resources.source.path)/policy/accuracy.rego
+---
+# Finally, we need something to receive our cloudevent announcing success!
+# That is this services only purpose
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-display
+  namespace: policy-pipeline
+  labels:
+    app: event-display
+spec:
+  type: ClusterIP
+  ports:
+    - name: listener
+      port: 8080
+      protocol: TCP
+  selector:
+    app: event-display
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: event-display
+  namespace: policy-pipeline
+  labels:
+    app: event-display
+spec:
+  hostname: event-display
+  containers:
+  - image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display
+    name: web

@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: create-webhook-run
+  namespace: policy-pipeline
+spec:
+  taskRef:
+    name: create-webhook
+  inputs:
+    params:
+    - name: GitHubOrg
+      value: "font"
+    - name: GitHubUser
+      value: "font"
+    - name: GitHubRepo
+      value: "Summit2020LogoDetection"
+    - name: GitHubSecretName
+      value: webhook-secret
+    - name: GitHubAccessTokenKey
+      value: token
+    - name: GitHubSecretStringKey
+      value: secret
+    - name: ExternalDomain
+      value: triggers.apps.partners.rhsummit2020.cloud # Modify to use your FQDN e.g. triggers.apps.<clustername>.<domain>
+  timeout: 1000s
+  serviceAccountName: tekton-triggers-createwebhook
