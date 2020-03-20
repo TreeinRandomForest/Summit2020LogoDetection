@@ -97,3 +97,18 @@ spec:
           secretKeyRef:
             name: $(inputs.params.secret_name)
             key: S3_ENDPOINT_URL
+      - name: MODEL_FILENAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: MODEL_FILENAME
+      - name: KAFKA_BOOTSTRAP
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: KAFKA_BOOTSTRAP
+      - name: KAFKA_TOPIC
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: KAFKA_TOPIC
