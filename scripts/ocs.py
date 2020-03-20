@@ -1,6 +1,7 @@
 import boto3
 import json
 import os
+import sys
 import urllib3
 from kafka import KafkaProducer
 
@@ -39,6 +40,10 @@ def main():
 
     model_object = get_s3_object(s3_access_key, s3_secret_key, s3_bucket_name,
                                  s3_endpoint_url, model_filename)
+
+    if model_object == None:
+        print("Error: S3 object name " + model_filename + " not found")
+        sys.exit(1)
 
     message = create_json_message(model_object, s3_bucket_name)
 
