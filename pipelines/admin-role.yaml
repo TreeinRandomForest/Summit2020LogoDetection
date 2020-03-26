@@ -58,6 +58,16 @@ rules:
   - update
   - patch
   - delete
+- apiGroups:
+  - ai.rhsummit2020.cloud
+  resources:
+  - modelaccuracies
+  verbs:
+  - get
+  - create
+  - update
+  - patch
+  - delete
 ---
 apiVersion: v1
 kind: ServiceAccount
