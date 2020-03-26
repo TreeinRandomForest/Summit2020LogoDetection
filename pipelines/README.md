@@ -118,6 +118,21 @@ Then Create the webhook task:
 oc apply -f ./pipelines/webhook-run.yaml
 ```
 
+## Install OPA Gatekeeper ConstraintTemplate, Constraint, and ModelAccuracy CRD
+
+Install the ModelAccuracy CRD that represents the CRs for model
+accuracy, followed by the `ConstraintTemplate` and `AIModelAccuracyThreshold`
+constraint to prevent model accuracies that are below our threshold from being used.
+
+```bash
+oc apply -f ./policy/ai.rhsummit2020.cloud_modelaccuracies-crd.yaml
+oc apply -f ./policy/modelaccuracythreshold-template.yaml
+oc apply -f ./policy/modelaccuracythreshold.yaml
+```
+
+Now when you commit and push changes you can see OPA prevent the model
+accuracy.
+
 ## Watch the Trigger and Pipeline Work!
 
 Commit and push an empty commit to your development repo.
