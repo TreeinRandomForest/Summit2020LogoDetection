@@ -1,12 +1,12 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: AIModelAccuracy
+kind: AIModelAccuracyThreshold
 metadata:
-  name: model-accuracy
+  name: model-accuracy-threshold
 spec:
   enforcementAction: deny
   match:
     kinds:
-      - apiGroups: ["ai.ifontlabs.com"]
+      - apiGroups: ["ai.rhsummit2020.cloud"]
         kinds: ["ModelAccuracy"]
     namespaces:
       - "policy-pipeline"

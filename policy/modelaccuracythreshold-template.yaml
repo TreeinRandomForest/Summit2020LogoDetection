@@ -1,12 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: aimodelaccuracy
+  name: aimodelaccuracythreshold
 spec:
   crd:
     spec:
       names:
-        kind: AIModelAccuracy
+        kind: AIModelAccuracyThreshold
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -16,7 +16,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package aimodelaccuracy
+        package aimodelaccuracythreshold
 
         # For Pods
         violation[{"msg": msg}] {
