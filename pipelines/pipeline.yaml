@@ -42,18 +42,14 @@ spec:
         type: git
   steps:
     - name: apply
-      image: instrumenta/conftest:v0.17.0
+      image: quay.io/openshift/origin-cli:4.3
       command:
         # Actual command name needs to be first because even if entrypoint is
         # set to this command in the image already, the entrypoint is overridden
         # by tekton.
-        - conftest
-        - test
-        - -i
-        - json
-        - $(inputs.resources.source.path)/outputs/metrics
-        - -p
-        - $(inputs.resources.source.path)/policy/accuracy.rego
+        - bash
+        - $(inputs.resources.source.path)/scripts/create-model-accuracy-cr.sh
+      workingDir: $(inputs.resources.source.path)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Task
