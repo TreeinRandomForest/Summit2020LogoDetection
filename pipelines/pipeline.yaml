@@ -22,7 +22,7 @@ spec:
             resource: source-repo
     - name: publish-model
       taskRef:
-        name: ceph-s3-to-kafka-queue
+        name: ceph-s3-to-omm
       runAfter:
         - model-accuracy-policy
       resources:
@@ -54,7 +54,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: ceph-s3-to-kafka-queue
+  name: ceph-s3-to-omm
   namespace: policy-pipeline
 spec:
   inputs:
@@ -98,13 +98,28 @@ spec:
           secretKeyRef:
             name: $(inputs.params.secret_name)
             key: MODEL_FILENAME
-      - name: KAFKA_BOOTSTRAP
+      - name: SAS_OMM_SERVER
         valueFrom:
           secretKeyRef:
             name: $(inputs.params.secret_name)
-            key: KAFKA_BOOTSTRAP
-      - name: KAFKA_TOPIC
+            key: SAS_OMM_SERVER
+      - name: SAS_OMM_USER
         valueFrom:
           secretKeyRef:
             name: $(inputs.params.secret_name)
-            key: KAFKA_TOPIC
+            key: SAS_OMM_USER
+      - name: SAS_OMM_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_PASSWORD
+      - name: SAS_OMM_PROJECT_NAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_PROJECT_NAME
+      - name: SAS_OMM_MODEL_NAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_MODEL_NAME
