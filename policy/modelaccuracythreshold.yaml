@@ -11,4 +11,4 @@ spec:
     namespaces:
       - "policy-pipeline"
   parameters:
-    accuracyThreshold: 0.9
+    accuracyThreshold: 1.0
