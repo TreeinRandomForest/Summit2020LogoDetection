@@ -5,7 +5,7 @@ import sys
 import urllib3
 from kafka import KafkaProducer
 
-def get_s3_object(access_key, secret_key, bucket, url, objectName):
+def get_s3_object(access_key, secret_key, bucket, url, object_name):
     s3 = boto3.client('s3',endpoint_url=url,
                            aws_access_key_id=access_key,
                            aws_secret_access_key=secret_key,
@@ -13,7 +13,7 @@ def get_s3_object(access_key, secret_key, bucket, url, objectName):
     print("Bucket contents:")
     for key in s3.list_objects(Bucket=bucket)['Contents']:
         print(key['Key'])
-        if key['Key'] == objectName:
+        if key['Key'] == object_name:
             return key
             break
     return None
