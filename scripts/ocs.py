@@ -6,12 +6,12 @@ import urllib3
 from kafka import KafkaProducer
 
 def get_s3_object(access_key, secret_key, bucket, url, objectName):
-    s3 = boto3.client('s3',endpoint_url = url,
-                           aws_access_key_id = access_key,
-                           aws_secret_access_key = secret_key,
+    s3 = boto3.client('s3',endpoint_url=url,
+                           aws_access_key_id=access_key,
+                           aws_secret_access_key=secret_key,
                            verify=False)
     print("Bucket contents:")
-    for key in s3.list_objects(Bucket = bucket)['Contents']:
+    for key in s3.list_objects(Bucket=bucket)['Contents']:
         print(key['Key'])
         if key['Key'] == objectName:
             return key
@@ -48,7 +48,7 @@ def main():
     message = create_json_message(model_object, s3_bucket_name)
     print('Sending message:', message)
 
-    producer = KafkaProducer(bootstrap_servers = kafka_bootstrap, acks='all')
+    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap, acks='all')
     send_kafka_message(producer, kafka_topic, json.dumps(message).encode('utf-8'))
     print('Message sent')
 
