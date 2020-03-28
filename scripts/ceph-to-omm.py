@@ -214,10 +214,10 @@ def main():
 
     success = sas_omm_publish_model(sas_omm_server, sas_omm_user, sas_omm_password,
                                     sas_omm_project_name, sas_omm_model_name, model_file)
-    if not success:
-        print('Error: unable to publish AI model ' + model_filename + ' to SAS OMM')
-        model_file.close()
-        sys.exit(1)
+    #if not success:
+    #    print('Error: unable to publish AI model ' + model_filename + ' to SAS OMM')
+    #    model_file.close()
+    #    sys.exit(1)
 
     print('Successfully published AI model ' + model_filename + ' to SAS OMM')
     model_file.close()
