@@ -71,7 +71,7 @@ spec:
       image: quay.io/ifont/ubi8-python-36
       command:
         - python
-        - $(inputs.resources.source.path)/scripts/ocs.py
+        - $(inputs.resources.source.path)/scripts/ceph-to-omm.py
       env:
       - name: ACCESS_KEY_ID
         valueFrom:
