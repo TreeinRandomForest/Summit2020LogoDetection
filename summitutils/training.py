@@ -41,6 +41,10 @@ def get_dicts(IMG_DIR):
 
     return dataset_dict
 
+def unregister():
+    DatasetCatalog.clear()
+    MetadataCatalog._NAME_TO_META = {}
+
 def register(IMG_DIR, class_names, subfolders=['train', 'test']):
     '''Register datasets for detectron2
     '''
@@ -60,7 +64,7 @@ def sample_plot(dataset_dict, metadata, LOC):
     d = random.sample(dataset_dict, 1)[0]
     print(d)
     img = cv2.imread(os.path.join(LOC, d["file_name"]))
-    visualizer = Visualizer(img[:, :, ::-1], metadata=metadata, scale=0.5)
+    visualizer = Visualizer(img, metadata=metadata, scale=0.5)
     vis = visualizer.draw_dataset_dict(d)
     plt.imshow(vis.get_image()[:, :, ::-1])
     
@@ -123,7 +127,7 @@ def infer_img(predictor, img_filename, metadata, tfm=None):
     return outputs
 
 def infer_img_v2(predictor, img_filename, metadata, tfm=None, reverse=False):
-    img = Image.open(img_filename)
+    img = Image.open(img_filename).convert('RGB')
     if tfm is not None:
         img = tfm(img)
     img = np.array(img)
