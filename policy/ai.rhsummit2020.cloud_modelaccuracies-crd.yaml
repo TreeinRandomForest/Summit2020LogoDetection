@@ -33,10 +33,8 @@ spec:
           description: ModelAccuracySpec defines the desired state of ModelAccuracy
           properties:
             accuracy:
-              description: Accuracy of the model represented as a percentage e.g.
-                80 for 80%.
-              format: int64
-              type: integer
+              description: Accuracy of the model as a decimal e.g. 0.9577 for 95.77%.
+              type: string
           type: object
         status:
           description: ModelAccuracyStatus defines the observed state of ModelAccuracy
