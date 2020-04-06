@@ -20,8 +20,8 @@ spec:
 
         # For Pods
         violation[{"msg": msg}] {
-          accuracy := input.review.object.spec.accuracy
-          accuracyThreshold := input.parameters.accuracyThreshold * 100
+          accuracy := to_number(input.review.object.spec.accuracy)
+          accuracyThreshold := input.parameters.accuracyThreshold
           accuracy < accuracyThreshold
-          msg := sprintf("Submitted model accuracy value %v%% is unacceptable. Model accuracy must be greater than or equal to %v%%.", [accuracy, accuracyThreshold])
+          msg := sprintf("Submitted model accuracy value %v%% is unacceptable. Model accuracy must be greater than or equal to %v%%.", [accuracy * 100, accuracyThreshold * 100])
         }
