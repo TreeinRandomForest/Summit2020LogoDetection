@@ -23,5 +23,5 @@ spec:
           accuracy := input.review.object.spec.accuracy
           accuracyThreshold := input.parameters.accuracyThreshold * 100
           accuracy < accuracyThreshold
-          msg := sprintf("Unacceptable accuracy value %v%%. Accuracy must be greater than or equal to %v%%.", [accuracy, accuracyThreshold])
+          msg := sprintf("Submitted model accuracy value %v%% is unacceptable. Model accuracy must be greater than or equal to %v%%.", [accuracy, accuracyThreshold])
         }
