@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: AIModelAccuracyThreshold
+metadata:
+  name: model-accuracy-threshold
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["ai.rhsummit2020.cloud"]
+        kinds: ["ModelAccuracy"]
+    namespaces:
+      - "policy-pipeline"
+  parameters:
+    accuracyThreshold: 1.0

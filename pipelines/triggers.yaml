@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: policy-pipeline-triggertemplate
+  namespace: policy-pipeline
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: namespace
+      description: The namespace to create the resources
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: source-repo-$(uid)
+      spec:
+        type: git
+        params:
+        - name: revision
+          value: $(params.gitrevision)
+        - name: url
+          value: $(params.gitrepositoryurl)
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: opa-policy-pipeline-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        serviceAccountName: tekton-triggers-admin
+        pipelineRef:
+          name: opa-policy-pipeline
+        resources:
+          - name: source-repo
+            resourceRef:
+              name: source-repo-$(uid)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: policy-pipeline-pipelinebinding
+  namespace: policy-pipeline
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: namespace
+      value: policy-pipeline
+    - name: gitrepositoryurl
+      value: "https://github.com/$(body.repository.full_name)"
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: policy-pipeline-listener
+  namespace: policy-pipeline
+spec:
+  serviceAccountName: tekton-triggers-admin
+  triggers:
+    - bindings:
+      - name: policy-pipeline-pipelinebinding
+      template:
+        name: policy-pipeline-triggertemplate

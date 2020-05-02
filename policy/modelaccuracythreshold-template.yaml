@@ -1,0 +1,27 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: aimodelaccuracythreshold
+spec:
+  crd:
+    spec:
+      names:
+        kind: AIModelAccuracyThreshold
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            accuracyThreshold:
+              type: number
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package aimodelaccuracythreshold
+
+        # For Pods
+        violation[{"msg": msg}] {
+          accuracy := to_number(input.review.object.spec.accuracy)
+          accuracyThreshold := input.parameters.accuracyThreshold
+          accuracy < accuracyThreshold
+          msg := sprintf("Submitted model accuracy %v%% is unacceptable. Model accuracy must be greater than or equal to %v%%.", [accuracy * 100, accuracyThreshold * 100])
+        }

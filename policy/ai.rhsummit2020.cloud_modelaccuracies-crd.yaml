@@ -1,0 +1,53 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: modelaccuracies.ai.rhsummit2020.cloud
+spec:
+  group: ai.rhsummit2020.cloud
+  names:
+    kind: ModelAccuracy
+    listKind: ModelAccuracyList
+    plural: modelaccuracies
+    singular: modelaccuracy
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      description: ModelAccuracy is the Schema for the modelaccuracies API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: ModelAccuracySpec defines the desired state of ModelAccuracy
+          properties:
+            accuracy:
+              description: Accuracy of the model as a decimal e.g. 0.9577 for 95.77%.
+              type: string
+          type: object
+        status:
+          description: ModelAccuracyStatus defines the observed state of ModelAccuracy
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

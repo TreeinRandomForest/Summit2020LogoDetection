@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: create-ingress-run
+  namespace: policy-pipeline
+spec:
+  taskRef:
+    name: create-ingress
+  inputs:
+    params:
+    - name: CreateCertificate
+      value: "true"
+    - name: CertificateKeyPassphrase
+      value: asecretphrase
+    - name: CertificateSecretName
+      value: ingresssecret
+    - name: ExternalDomain
+      value: triggers.apps.partners.rhsummit2020.cloud # Modify to use your FQDN e.g. triggers.apps.<clustername>.<domain>
+    - name: Service
+      value: el-policy-pipeline-listener
+    - name: ServicePort
+      value: "8080"
+  timeout: 1000s
+  serviceAccountName: tekton-triggers-createwebhook

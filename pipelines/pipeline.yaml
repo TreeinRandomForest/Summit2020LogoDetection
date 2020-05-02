@@ -1,0 +1,125 @@
+---
+# The opa-policy Pipeline will run through several tasks:
+# - source is pulled from git
+# - policy is applied via opa
+# - model is copied from ceph s3 to kafka queue
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: opa-policy-pipeline
+  namespace: policy-pipeline
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+    - name: model-accuracy-policy
+      taskRef:
+        name: apply-opa-policy
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: publish-model
+      taskRef:
+        name: ceph-s3-to-omm
+      runAfter:
+        - model-accuracy-policy
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: apply-opa-policy
+  namespace: policy-pipeline
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+  steps:
+    - name: apply
+      image: quay.io/openshift/origin-cli:4.3
+      command:
+        # Actual command name needs to be first because even if entrypoint is
+        # set to this command in the image already, the entrypoint is overridden
+        # by tekton.
+        - bash
+        - $(inputs.resources.source.path)/scripts/create-model-accuracy-cr.sh
+      workingDir: $(inputs.resources.source.path)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: ceph-s3-to-omm
+  namespace: policy-pipeline
+spec:
+  inputs:
+    resources:
+      - name: source
+        type: git
+    params:
+      - name: secret_name
+        type: string
+        description: Name of the secret holding the keys
+        default: ocs-secret
+  steps:
+    - name: publish-model
+      image: quay.io/ifont/ubi8-python-36
+      command:
+        - python
+        - $(inputs.resources.source.path)/scripts/ceph-to-omm.py
+      env:
+      - name: ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: ACCESS_KEY_ID
+      - name: SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SECRET_ACCESS_KEY
+      - name: S3_BUCKET
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: S3_BUCKET
+      - name: S3_ENDPOINT_URL
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: S3_ENDPOINT_URL
+      - name: MODEL_FILENAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: MODEL_FILENAME
+      - name: SAS_OMM_SERVER
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_SERVER
+      - name: SAS_OMM_USER
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_USER
+      - name: SAS_OMM_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_PASSWORD
+      - name: SAS_OMM_PROJECT_NAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_PROJECT_NAME
+      - name: SAS_OMM_MODEL_NAME
+        valueFrom:
+          secretKeyRef:
+            name: $(inputs.params.secret_name)
+            key: SAS_OMM_MODEL_NAME
